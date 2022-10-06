@@ -14,7 +14,8 @@ db.once('open', () => {
 
 // Starting express server
 const app = express()
-
+app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.urlencoded({extended: true}))
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 
@@ -22,10 +23,29 @@ app.get('/', (request, response) => {
     response.render('home')
 })
 
-app.get('/makecampground', async (request, response) => {
-    const camp = new Campground({title: 'My Backyard', description: 'Cheap camping'})
-    await camp.save()
-    response.send(camp)
+app.get('/campgrounds', async (request, response) => {
+    const campgrounds = await Campground.find({})
+    response.render('campgrounds/index', {campgrounds})
+})
+
+app.get('/campgrounds/new', (request, response) => {
+    response.render('campgrounds/new')
+})
+
+app.post('/campgrounds', async (request, response) => {
+    const newCampground = new Campground(request.body.campground)
+    newCampground.save()
+    response.redirect(`campgrounds/${newCampground._id}`)
+})
+
+app.get('/campgrounds/:id', async (request, response) => {
+    const campground = await Campground.findById(request.params.id)
+    response.render('campgrounds/show', {campground})
+})
+
+app.get('/campgrounds/:id/edit', async (request, response) => {
+    const campground = await Campground.findById(request.params.id)
+    response.render('campgrounds/edit', {campground})
 })
 
 app.listen(3000, () => {
