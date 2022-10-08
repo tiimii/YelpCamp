@@ -1,11 +1,11 @@
 <% layout('layouts/boilerplate') %> 
 <div class="container text-center">
     <div class="row">
-        <div class="col my-4">
+        <div class="col mt-4 mb-2">
             <h1>All Campgrounds</h1>
         </div>
     </div>
-    <div class="row">
+    <div class="row my-4">
         <div class="col">
             <form action="/campgrounds/new">
                 <div class="form-group">
@@ -14,13 +14,25 @@
             </form>
         </div>
     </div>
-    <div class="row">
-        <div class="col text-left">
-            <ul class="list-group">
-                <% for (let campground of campgrounds) { %>
-                    <li class="list-group-item"><a href="/campgrounds/<%= campground._id %>"><%= campground.title %></a></li>
-                <% } %> 
-            </ul>
+    <% for (let campground of campgrounds) { %>
+        <div class="card mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <div>
+                        <img class="img-fluid" src="<%= campground.image %> " alt="">
+                    </div>
+                    <div class="my-4">
+                        <a href="/campgrounds/<%= campground._id %> " class="btn btn-primary">View Campground</a>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h3 class="card-title"><%= campground.title %> </h3>
+                        <h6 class="card-title"><%= campground.location %> </h6>
+                        <p class="card-text"><%= campground.description %> </p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    <% } %>  
 </div>
