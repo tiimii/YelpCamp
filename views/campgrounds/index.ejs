@@ -1,31 +1,26 @@
-<%- include('../partials/header') %>
-<%- include('../partials/navbar') %>
-</head>
-<body>
-    <div class="container text-center">
-        <div class="row">
-            <div class="col my-4">
-                <h1>All Campgrounds</h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <form action="/campgrounds/new">
-                    <div class="form-group">
-                        <button class="btn btn-primary">Add Campground</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col text-left">
-                <ul class="list-group">
-                    <% for (let campground of campgrounds) { %>
-                        <li class="list-group-item"><a href="/campgrounds/<%= campground._id %>"><%= campground.title %></a></li>
-                    <% } %> 
-                </ul>
-            </div>
+<% layout('layouts/boilerplate') %> 
+<div class="container text-center">
+    <div class="row">
+        <div class="col my-4">
+            <h1>All Campgrounds</h1>
         </div>
     </div>
-</body>
-<%- include('../partials/footer') %> 
+    <div class="row">
+        <div class="col">
+            <form action="/campgrounds/new">
+                <div class="form-group">
+                    <button class="btn btn-primary">Add Campground</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col text-left">
+            <ul class="list-group">
+                <% for (let campground of campgrounds) { %>
+                    <li class="list-group-item"><a href="/campgrounds/<%= campground._id %>"><%= campground.title %></a></li>
+                <% } %> 
+            </ul>
+        </div>
+    </div>
+</div>
