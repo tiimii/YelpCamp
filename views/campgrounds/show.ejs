@@ -1,39 +1,35 @@
 <%- include('../partials/header') %>
-<%- include('../partials/navbar') %> 
-<body>
-    <div class="container text-center">
-        <div class="row mt-4">
-            <div class="col">
-                <h1><%= campground.title %> </h1>
+<% layout('layouts/boilerplate') %> 
+<div class="container">
+    <div class="row">
+        <div class="col-8 offset-2">
+            <div class="card">
+                <img class="card-img-top" src="<%= campground.image %> " alt="">
+                <div class="card-body text-center">
+                    <h3 class="card-title"><%= campground.title %> </h3>
+                    <p class="card-text"><%= campground.description %> </p>
+                </div>
+                <ul class="list-group list-group-flush text-center">
+                    <li class="list-group-item text-muted"><%= campground.location %> </li>
+                    <li class="list-group-item">$<%= campground.price %> per night</li>
+                </ul>
+                <div class="card-body">
+                    <a href="/campgrounds/<%= campground._id %>/edit" class="card-link btn btn-warning">Edit</a>
+                    <form class="d-inline" action="/campgrounds/<%= campground._id %>?_method=DELETE" method="POST">
+                        <button class="btn btn-danger my-2">Delete Campground</button>
+                    </form>
+                </div>
             </div>
         </div>
-        <div class="row mb-4">
-            <div class="col">
-                <h2><%= campground.location %> </h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <form action="/campgrounds/<%= campground._id %>/edit">
-                    <button class="btn btn-primary my-2">Edit Campground</button>
-                </form>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <form action="/campgrounds/<%= campground._id %>?_method=DELETE" method="POST">
-                    <button class="btn btn-primary my-2">Delete Campground</button>
-                </form>
-            </div>
-        </div>
-        <div class="row">
+    </div>
+    <section>
+        <hr>
+        <div class="row text-center">
             <div class="col">
                 <form action="/campgrounds">
                     <button class="btn btn-primary my-2">Show All Campground</button>
                 </form>
             </div>
         </div>
-    </div>
-    <div>
-</body>
-<%- include('../partials/footer') %>
+    </section>
+</div>

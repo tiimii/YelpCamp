@@ -1,34 +1,48 @@
-<%- include('../partials/header') %>
-<%- include('../partials/navbar') %>
-<body>
-    <div class="container text-center">
-        <div class="row my-4">
-            <div class="col">
-                <h1>New Campground</h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <form action="/campgrounds" method="POST">
-                    <div class="form-group">
-                        <label for="title" class="form-label">Name</label>
-                        <input type="text" id="title" name="campground[title]" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="location" class="form-label">Location</label>
-                        <input type="text" id="location" name="campground[location]" class="form-control">
-                    </div>
-                    <button class="btn btn-primary">Add Campground</button>
-                </form>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <form action="/campgrounds">
-                    <button class="btn btn-primary my-2">Show All Campgrounds</button>
-                </form>
-            </div>
+<% layout('layouts/boilerplate') %> 
+<div class="container">
+    <div class="row my-4 text-center">
+        <div class="col">
+            <h1>New Campground</h1>
         </div>
     </div>
-</body>
-<%- include('../partials/footer') %>
+    <div class="row">
+        <div class="col-6 offset-3">
+            <form action="/campgrounds" method="POST" class="fw-bold">
+                <div class="form-group my-4">
+                    <label for="title" class="form-label">Name</label>
+                    <input type="text" id="title" name="campground[title]" class="form-control">
+                </div>
+                <div class="form-group my-4">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" id="location" name="campground[location]" class="form-control">
+                </div>
+                <div class="form-group my-4">
+                    <label for="image" class="form-label">Image URL</label>
+                    <input type="text" id="image" name="campground[image]" class="form-control">
+                </div>
+                <div class="form-group my-4">
+                    <label for="price" class="form-label">Price</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="price-label">$</span>
+                        <input type="number" id="price" name="campground[price]" class="form-control" aria-label="price" aria-describedby="price-label">
+                    </div>
+                </div>
+                <div class="form-group my-4">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" name="campground[description]" id="description" cols="30" rows="10"></textarea>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-success my-4">Add Campground</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col">
+            <hr>
+            <form action="/campgrounds">
+                <button class="btn btn-primary my-4">Show All Campgrounds</button>
+            </form>
+        </div>
+    </div>
+</div>

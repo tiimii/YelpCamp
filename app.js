@@ -1,6 +1,7 @@
 // Requirements
 const express = require('express')
 const mongoose = require('mongoose')
+const ejsMate = require('ejs-mate')
 const morgan = require('morgan')
 const path = require('path')
 const methodOverride = require('method-override')
@@ -16,6 +17,7 @@ db.once('open', () => {
 
 // Starting express server
 const app = express()
+app.engine('ejs', ejsMate)
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({extended: true}))
 app.use(methodOverride('_method'))
