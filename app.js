@@ -1,6 +1,7 @@
 // Requirements
 const express = require('express')
 const mongoose = require('mongoose')
+const morgan = require('morgan')
 const path = require('path')
 const methodOverride = require('method-override')
 const Campground = require('./models/campground')
@@ -10,7 +11,7 @@ mongoose.connect('mongodb://localhost:27017/yelp-camp')
 const db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error:'))
 db.once('open', () => {
-    console.log('Database connected.')
+    console.log('Connected to the database.')
 })
 
 // Starting express server
@@ -18,6 +19,7 @@ const app = express()
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({extended: true}))
 app.use(methodOverride('_method'))
+app.use(morgan('tiny'))
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 
@@ -67,6 +69,11 @@ app.delete('/campgrounds/:id', async (request, response) => {
     const {id} = request.params
     await Campground.findByIdAndDelete(id)
     response.redirect('/campgrounds')
+})
+
+// 404 route
+app.use((request, response) => {
+    response.status(404).render('404')
 })
 
 app.listen(3000, () => {
