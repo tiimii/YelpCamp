@@ -3,6 +3,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const ejsMate = require('ejs-mate')
 const morgan = require('morgan')
+const joi = require('joi')
 const path = require('path')
 const catchAsync = require('./utils/catchAsync')
 const ExpressError = require('./utils/ExpressError')
@@ -44,7 +45,20 @@ app.get('/campgrounds/new', (request, response) => {
 
 // Add a new campground
 app.post('/campgrounds', catchAsync(async (request, response, next) => {
-    if (!request.body.campground) throw new ExpressError('Invalid Campground Data.', 400)
+    const campgroundSchema =joi.object({
+        campground: joi.object({
+            title: joi.string().required(),
+            location: joi.string().required(),
+            image: joi.string().required(),
+            price: joi.number().required().min(0),
+            description: joi.string().required()
+        }).required()
+    })
+    const {error} = campgroundSchema.validate(request.body)
+    if (result.error) {
+        const message = error.details.map(el => el.message.join(','))
+        throw new ExpressError(message, 400)
+    }
     const newCampground = new Campground(request.body.campground)
     newCampground.save()
     response.redirect(`/campgrounds/${newCampground._id}`)   
