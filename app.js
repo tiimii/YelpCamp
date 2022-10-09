@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const ejsMate = require('ejs-mate')
 const morgan = require('morgan')
 const path = require('path')
+const catchAsync = require('./utils/catchAsync')
 const methodOverride = require('method-override')
 const Campground = require('./models/campground')
 
@@ -30,10 +31,10 @@ app.get('/', (request, response) => {
 })
 
 // Go to all campgrounds page
-app.get('/campgrounds', async (request, response) => {
+app.get('/campgrounds', catchAsync(async (request, response) => {
     const campgrounds = await Campground.find({})
     response.render('campgrounds/index', {campgrounds})
-})
+}))
 
 // Go to add a campground page
 app.get('/campgrounds/new', (request, response) => {
@@ -41,41 +42,45 @@ app.get('/campgrounds/new', (request, response) => {
 })
 
 // Add a new campground
-app.post('/campgrounds', async (request, response) => {
+app.post('/campgrounds', catchAsync(async (request, response, next) => {
     const newCampground = new Campground(request.body.campground)
     newCampground.save()
-    response.redirect(`/campgrounds/${newCampground._id}`)
-})
+    response.redirect(`/campgrounds/${newCampground._id}`)   
+}))
 
 // go to a specific campground page
-app.get('/campgrounds/:id', async (request, response) => {
+app.get('/campgrounds/:id', catchAsync( async (request, response) => {
     const campground = await Campground.findById(request.params.id)
     response.render('campgrounds/show', {campground})
-})
+}))
 
 // Got to the Edit page
-app.get('/campgrounds/:id/edit', async (request, response) => {
+app.get('/campgrounds/:id/edit', catchAsync(async (request, response) => {
     const campground = await Campground.findById(request.params.id)
     response.render('campgrounds/edit', {campground})
-})
+}))
 
 // Edit Campground
-app.put('/campgrounds/:id', async (request, response) => {
+app.put('/campgrounds/:id', catchAsync(async (request, response) => {
     const {id} = request.params
     const campground = await Campground.findByIdAndUpdate(id, {...request.body.campground})
     response.redirect(`/campgrounds/${campground._id}`)
-})
+}))
 
 // Delete campground
-app.delete('/campgrounds/:id', async (request, response) => {
+app.delete('/campgrounds/:id', catchAsync(async (request, response) => {
     const {id} = request.params
     await Campground.findByIdAndDelete(id)
     response.redirect('/campgrounds')
-})
+}))
 
 // 404 route
-app.use((request, response) => {
-    response.status(404).render('404')
+// app.use((request, response) => {
+//     response.status(404).render('404')
+// })
+
+app.use((error, request, response, next) => {
+    response.send('Something went wrong. No worries though, I caught the error.')
 })
 
 app.listen(3000, () => {
