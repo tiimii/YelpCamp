@@ -5,6 +5,7 @@ const ejsMate = require('ejs-mate')
 const morgan = require('morgan')
 const path = require('path')
 const catchAsync = require('./utils/catchAsync')
+const ExpressError = require('./utils/ExpressError')
 const methodOverride = require('method-override')
 const Campground = require('./models/campground')
 
@@ -43,6 +44,7 @@ app.get('/campgrounds/new', (request, response) => {
 
 // Add a new campground
 app.post('/campgrounds', catchAsync(async (request, response, next) => {
+    if (!request.body.campground) throw new ExpressError('Invalid Campground Data.', 400)
     const newCampground = new Campground(request.body.campground)
     newCampground.save()
     response.redirect(`/campgrounds/${newCampground._id}`)   
@@ -75,12 +77,14 @@ app.delete('/campgrounds/:id', catchAsync(async (request, response) => {
 }))
 
 // 404 route
-// app.use((request, response) => {
-//     response.status(404).render('404')
-// })
+app.all('*', (request, response, next) => {
+   next(new ExpressError('Page not found', 404))
+})
 
+// Error Handler
 app.use((error, request, response, next) => {
-    response.send('Something went wrong. No worries though, I caught the error.')
+    const {message = 'Something went wrong', statusCode = 500} = error
+    response.status(statusCode).send(message)
 })
 
 app.listen(3000, () => {
