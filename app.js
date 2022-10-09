@@ -83,8 +83,9 @@ app.all('*', (request, response, next) => {
 
 // Error Handler
 app.use((error, request, response, next) => {
-    const {message = 'Something went wrong', statusCode = 500} = error
-    response.status(statusCode).send(message)
+    const { statusCode = 500} = error
+    if (!error.message) error.message = 'Oh no! Something went wrong!'
+    response.status(statusCode).render('error', {error})
 })
 
 app.listen(3000, () => {
