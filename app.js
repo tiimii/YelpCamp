@@ -3,7 +3,11 @@ const express = require('express')
 const mongoose = require('mongoose')
 const ejsMate = require('ejs-mate')
 const morgan = require('morgan')
+const Joi = require('joi')
+const {campgroundSchema} = require('./schemas.js')
 const path = require('path')
+const catchAsync = require('./utils/catchAsync')
+const ExpressError = require('./utils/ExpressError')
 const methodOverride = require('method-override')
 const Campground = require('./models/campground')
 
@@ -25,15 +29,26 @@ app.use(morgan('tiny'))
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 
+const validateCampground = (request, response, next) => {
+    const {error} = campgroundSchema.validate(request.body)
+    if (error) {
+        const message = error.details.map(el => el.message).join(',')
+        throw new ExpressError(message, 400)
+    } else {
+        next()
+    }
+}
+
+// Go to the home page
 app.get('/', (request, response) => {
     response.render('home')
 })
 
 // Go to all campgrounds page
-app.get('/campgrounds', async (request, response) => {
+app.get('/campgrounds', catchAsync(async (request, response) => {
     const campgrounds = await Campground.find({})
     response.render('campgrounds/index', {campgrounds})
-})
+}))
 
 // Go to add a campground page
 app.get('/campgrounds/new', (request, response) => {
@@ -41,41 +56,49 @@ app.get('/campgrounds/new', (request, response) => {
 })
 
 // Add a new campground
-app.post('/campgrounds', async (request, response) => {
+app.post('/campgrounds', validateCampground, catchAsync(async (request, response, next) => {
+    
     const newCampground = new Campground(request.body.campground)
     newCampground.save()
-    response.redirect(`/campgrounds/${newCampground._id}`)
-})
+    response.redirect(`/campgrounds/${newCampground._id}`)   
+}))
 
 // go to a specific campground page
-app.get('/campgrounds/:id', async (request, response) => {
+app.get('/campgrounds/:id', catchAsync( async (request, response) => {
     const campground = await Campground.findById(request.params.id)
     response.render('campgrounds/show', {campground})
-})
+}))
 
 // Got to the Edit page
-app.get('/campgrounds/:id/edit', async (request, response) => {
+app.get('/campgrounds/:id/edit', catchAsync(async (request, response) => {
     const campground = await Campground.findById(request.params.id)
     response.render('campgrounds/edit', {campground})
-})
+}))
 
 // Edit Campground
-app.put('/campgrounds/:id', async (request, response) => {
+app.put('/campgrounds/:id', validateCampground, catchAsync(async (request, response) => {
     const {id} = request.params
     const campground = await Campground.findByIdAndUpdate(id, {...request.body.campground})
     response.redirect(`/campgrounds/${campground._id}`)
-})
+}))
 
 // Delete campground
-app.delete('/campgrounds/:id', async (request, response) => {
+app.delete('/campgrounds/:id', catchAsync(async (request, response) => {
     const {id} = request.params
     await Campground.findByIdAndDelete(id)
     response.redirect('/campgrounds')
-})
+}))
 
 // 404 route
-app.use((request, response) => {
-    response.status(404).render('404')
+app.all('*', (request, response, next) => {
+   next(new ExpressError('Page not found', 404))
+})
+
+// Error Handler
+app.use((error, request, response, next) => {
+    const { statusCode = 500} = error
+    if (!error.message) error.message = 'Oh no! Something went wrong!'
+    response.status(statusCode).render('error', {error})
 })
 
 app.listen(3000, () => {
